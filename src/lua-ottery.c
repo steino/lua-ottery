@@ -12,7 +12,7 @@ const char hexTable[33] = "0123456789abcdef0123456789ABCDEF";
 void hexify(char *out, const uint8_t *in, int size)
 {
 	int i;
-	for(i = 0; i < size/2; i++) {
+	for(i = 0; i < size; i++) {
 		out[i*2] = (char)hexTable[in[i]>>4];
 		out[i*2+1] = (char)hexTable[in[i]&0x0F];
 	}
@@ -52,14 +52,13 @@ static int lottery_bytes(lua_State * L)
 {
 	int num = luaL_checkint(L, 1);
 	if(num > 0) {
-		uint8_t buf[num];
-		char str[num];
+		uint8_t buf[num / 2];
+		char str[num + 1];
 		ottery_rand_bytes(buf, sizeof(buf));
 		hexify(str, buf, sizeof(buf));
 		lua_pushstring(L, str);
-		lua_pushnumber(L, sizeof(buf));
 
-		return 2;
+		return 1;
 	} else {
 		luaL_error(L, "Needs more then zero bytes");
 
