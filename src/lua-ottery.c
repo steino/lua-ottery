@@ -7,6 +7,18 @@
 #define LUAOTTERY_COPYRIGHT 			"Copyright (C) 2014, lua-ottery authors"
 #define LUAOTTERY_DESCRIPTION  		"Binding for libottery."
 
+const char hexTable[33] = "0123456789abcdef0123456789ABCDEF";
+
+void hexify(char *out, const uint8_t *in, int size)
+{
+	int i;
+	for(i = 0; i < size/2; i++) {
+		out[i*2] = (char)hexTable[in[i]>>4];
+		out[i*2+1] = (char)hexTable[in[i]&0x0F];
+	}
+	out[i*2] = 0;
+}
+
 // luaL_setfuncs() from lua 5.2
 static void setfuncs (lua_State *L, const luaL_reg*l, int nup)
 {
@@ -40,11 +52,14 @@ static int lottery_bytes(lua_State * L)
 {
 	int num = luaL_checkint(L, 1);
 	if(num > 0) {
-		char buf[num];
+		unsigned char buf[num];
+		char str[num];
 		ottery_rand_bytes(buf, sizeof(buf));
-		lua_pushstring(L, buf);
+		hexify(str, buf, sizeof(buf));
+		lua_pushstring(L, str);
+		lua_pushnumber(L, sizeof(buf));
 
-		return 1;
+		return 2;
 	} else {
 		luaL_error(L, "Needs more then zero bytes");
 
@@ -60,7 +75,7 @@ static const struct luaL_reg E[] =
 static const struct luaL_reg R[] =
 {
 	{ "number", lottery_number },
-	{ "bytes", lottery_bytes },
+	{ "hexstring", lottery_bytes },
 
 	{ NULL, NULL }
 };
