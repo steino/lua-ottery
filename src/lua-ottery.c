@@ -52,7 +52,7 @@ static int lottery_bytes(lua_State * L)
 {
 	int num = luaL_checkint(L, 1);
 	if(num > 0) {
-		unsigned char buf[num];
+		uint8_t buf[num];
 		char str[num];
 		ottery_rand_bytes(buf, sizeof(buf));
 		hexify(str, buf, sizeof(buf));
